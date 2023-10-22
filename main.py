@@ -42,8 +42,8 @@ def parens_match_iterative(mylist):
     >>>parens_match_iterative(['('])
     False
     """
-    ### TODO
-    pass
+    counter = iterate(parens_update, 0, mylist)
+    return (counter == 0)
 
 
 def parens_update(current_output, next_input):
@@ -58,16 +58,20 @@ def parens_update(current_output, next_input):
     Returns:
       the updated value of `current_output`
     """
-    ###TODO
-    pass
+    if next_input == '(':
+      current_output += 1
+    elif next_input == ')':
+      current_output -= 1
+    if current_output < 0:
+        return -1
+    return current_output
 
 
 def test_parens_match_iterative():
     assert parens_match_iterative(['(', ')']) == True
     assert parens_match_iterative(['(']) == False
     assert parens_match_iterative([')']) == False
-
-
+  
 #### Scan solution
 
 def parens_match_scan(mylist):
@@ -87,8 +91,10 @@ def parens_match_scan(mylist):
     False
     
     """
-    ###TODO
-    pass
+    mapped_list = list(map(paren_map, mylist)) # maps list to appropriate counts (1,0, or -1)
+    cumulative_sum, total_sum = scan(lambda x, y: x + y, 0, mapped_list) # scan to find the cumulative sum of those counts
+    min_value = reduce(min_f, float('inf'), cumulative_sum) # reduce to find the minimum value in the cumulative sum
+    return (total_sum == 0) and (min_value >= 0) # if the total sum is 0 and the minimum value is >= 0, then the parenthesis are balanced
 
 def scan(f, id_, a):
     """
@@ -160,8 +166,27 @@ def parens_match_dc_helper(mylist):
       L is the number of unmatched left parentheses. This output is used by 
       parens_match_dc to return the final True or False value
     """
-    ###TODO
-    pass
+    if len(mylist) == 0:
+      return (0,0)
+    elif len(mylist) == 1:
+      if mylist[0] == "(":
+        return (0,1)
+      elif mylist[0] == ")":
+        return (1,0)
+      else:
+        pass
+      return (0,0)
+
+    mid = len(mylist) // 2
+    left_half = mylist[:mid]
+    right_half = mylist[mid:]
+
+    R1, L1 = parens_match_dc_helper(left_half)
+    R2, L2 = parens_match_dc_helper(right_half)
+    if L1 > R2:
+      return (R1, (L1 - R2) + L2)
+    else:
+      return ((R2 - L1) + R1, L2)
     
 
 def test_parens_match_dc():
